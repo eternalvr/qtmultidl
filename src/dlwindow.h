@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QThreadPool>
 #include <QThread>
+#include <QSpinBox>
 
 #include "mp3.h"
 #include "downloadthread.h"
@@ -29,7 +30,7 @@ class DLWindow : public QMainWindow
 public:
     explicit DLWindow(QWidget *parent = 0);
     ~DLWindow();
-    void DLWindow::initialize();
+    void initialize();
     static bool loggedIn;
     void SetConfiguration(Configuration *config);
     void reloadMyMusic();
@@ -46,6 +47,10 @@ private slots:
     void on_btnDownloadSelected_clicked();
 
     void ShowTableContextMenu(const QPoint &point);
+    void on_tableWidget_doubleClicked(const QModelIndex &index);
+
+    void on_spinDownloads_valueChanged(int arg1);
+
 private:
     Ui::DLWindow *ui;
     Configuration *config;

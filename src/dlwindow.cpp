@@ -16,6 +16,7 @@ void DLWindow::initialize()
     downloadThreads->setMaxThreadCount(5);
 
     ui->txtSaveDir->setText(config->SaveDir);
+    ui->spinDownloads->setValue(config->ConcurrentDownloads);
 
     connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(ShowTableContextMenu(const QPoint&)));
@@ -71,6 +72,7 @@ void DLWindow::SetConfiguration(Configuration *config)
 
 DLWindow::~DLWindow()
 {
+    config->Save();
     delete ui;
 }
 
@@ -213,13 +215,14 @@ void DLWindow::startDownload(int row)
 
     qDebug() << "Starting download for row " << row << endl;
 
-
     for(int i = 0; i < mp3s.count(); i++) {
         if(mp3s.at(i)->Session == session){
            dlT->Mp3 = mp3s.at(i);
            dlT->progressBar = (QProgressBar *)ui->tableWidget->cellWidget(row, 3);
-           dlT->DownloadDirectory = config->SaveDir;
-
+           dlT->DownloadDirectory = config->SaveDir;           
+           if(dlT->progressBar->value() == dlT->progressBar->maximum()){
+               continue;
+           }
            QThreadPool::globalInstance()->start(dlT);
         }
     }
@@ -237,8 +240,11 @@ void DLWindow::on_btnDownloadAll_clicked()
         return;
     }
 
-    ui->tableWidget->selectAll();
+
     on_btnDownloadSelected_clicked();
+    for(int i = 0; i < ui->tableWidget->rowCount();i++)
+     startDownload(i);
+
 
 
 }
@@ -246,10 +252,34 @@ void DLWindow::on_btnDownloadAll_clicked()
 
 void DLWindow::on_btnDownloadSelected_clicked()
 {
+    if(mp3s.count() == 0 ) {
+        QMessageBox::critical(this, "Download nicht möglich", "Sie haben keine MP3s in Ihrem Speicher, die Sie momentan herunterladen können. Probieren Sie es später erneut." ,QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Ok);
+        return;
+    }
+
+    if(ui->txtSaveDir->text() == ""){
+        on_btnBrowse_clicked();
+        return;
+    }
+
+
     QList<QTableWidgetItem *> selectedItems = ui->tableWidget->selectedItems();
     foreach (QTableWidgetItem *item, selectedItems) {
         if(item->column() == 0) {
             startDownload(item->row());
         }
+    }
+}
+
+void DLWindow::on_tableWidget_doubleClicked(const QModelIndex &index)
+{
+   on_btnDownloadSelected_clicked();
+}
+
+void DLWindow::on_spinDownloads_valueChanged(int arg1)
+{
+    if(arg1 > 0){
+        QThreadPool::globalInstance()->setMaxThreadCount(arg1);
+        config->ConcurrentDownloads = arg1;
     }
 }

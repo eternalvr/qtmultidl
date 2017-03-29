@@ -91,10 +91,7 @@ void DownloadThread::downloadFinished()
     outputFile->deleteLater();
 
     if (currentDownload->error()) {
-        fprintf(stderr, "Failed: %s\n", qPrintable(currentDownload->errorString()));
-    } else {
-        printf("Succeeded.\n");
-
+        progressBar->setFormat("Download Error");
     }
 
     currentDownload->deleteLater();

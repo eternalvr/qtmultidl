@@ -15,6 +15,7 @@ void Configuration::Load()
     UseSSL = settings->value("use_ssl").toBool();
 
     SaveDir = settings->value("save_dir","").toString();
+    ConcurrentDownloads = settings->value("concurrent_downloads", 4).toInt();
 }
 
 void Configuration::Save()
@@ -26,4 +27,5 @@ void Configuration::Save()
     settings->setValue("use_ssl", UseSSL);
 
     settings->setValue("save_dir", SaveDir);
+    settings->setValue("concurrent_downloads", ConcurrentDownloads);
 }

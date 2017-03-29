@@ -13,6 +13,8 @@ public:
     QString Username;
     QString AutoLogin;
     QString SaveDir;
+    int ConcurrentDownloads;
+
 
     bool UseSSL;
 

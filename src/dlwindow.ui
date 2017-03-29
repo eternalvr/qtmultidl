@@ -7,26 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>647</width>
-    <height>544</height>
+    <height>606</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>DLWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>reload</string>
-    </property>
-   </widget>
    <widget class="QTableWidget" name="tableWidget">
     <property name="enabled">
      <bool>true</bool>
@@ -34,9 +21,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>130</y>
       <width>621</width>
-      <height>421</height>
+      <height>321</height>
      </rect>
     </property>
     <property name="font">
@@ -82,7 +69,7 @@
      <number>3</number>
     </property>
     <attribute name="horizontalHeaderVisible">
-     <bool>true</bool>
+     <bool>false</bool>
     </attribute>
     <attribute name="verticalHeaderVisible">
      <bool>false</bool>
@@ -154,11 +141,24 @@ border: 1px solid black;
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="btnDownloadAll">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>460</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Alles Herunterladen</string>
+    </property>
+   </widget>
    <widget class="QLineEdit" name="txtSaveDir">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>460</y>
+      <x>220</x>
+      <y>20</y>
       <width>211</width>
       <height>25</height>
      </rect>
@@ -178,8 +178,8 @@ border: 1px solid black;
    <widget class="QPushButton" name="btnBrowse">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>460</y>
+      <x>430</x>
+      <y>20</y>
       <width>41</width>
       <height>25</height>
      </rect>
@@ -191,40 +191,78 @@ border: 1px solid black;
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>460</y>
-      <width>71</width>
+      <x>70</x>
+      <y>20</y>
+      <width>151</width>
       <height>25</height>
      </rect>
     </property>
     <property name="text">
-     <string>SpeicherOrt:</string>
+     <string>1. Ordner auswählen:</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnDownloadAll">
+   <widget class="QSpinBox" name="spinDownloads">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>460</y>
-      <width>141</width>
-      <height>23</height>
+      <x>580</x>
+      <y>490</y>
+      <width>49</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>4</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblConcurrent">
+    <property name="geometry">
+     <rect>
+      <x>377</x>
+      <y>494</y>
+      <width>201</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Alles Herunterladen</string>
+     <string>Max. Gleichzeitige Downloads:</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnDownloadSelected">
+   <widget class="QCheckBox" name="chkDeleteSuccessful">
     <property name="geometry">
      <rect>
-      <x>354</x>
-      <y>460</y>
-      <width>131</width>
-      <height>23</height>
+      <x>20</x>
+      <y>480</y>
+      <width>21</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string>Markierte Herunterladen</string>
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>470</y>
+      <width>151</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Nach erfolgreichem Download Titel aus dem Speicher löschen</string>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -234,7 +272,7 @@ border: 1px solid black;
      <x>0</x>
      <y>0</y>
      <width>647</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
