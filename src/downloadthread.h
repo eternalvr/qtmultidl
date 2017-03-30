@@ -47,6 +47,7 @@ private:
 
 signals:
     void onStartDownload();
+    void onDownloadFinished(MP3 *mp3);
 
 private slots:
     void downloadStart();

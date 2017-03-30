@@ -5,6 +5,8 @@ NetManager *NetManager::GetInstance()
     static NetManager *instance;
     if(instance == NULL) {
         instance = new NetManager();
+
+
     }
     return instance;
 }
@@ -103,3 +105,4 @@ void NetManager::syncRequestFinished(QNetworkReply *reply)
 
 }
 
+QThread *NetManager::NMThread = new QThread();

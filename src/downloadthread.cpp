@@ -96,4 +96,6 @@ void DownloadThread::downloadFinished()
 
     currentDownload->deleteLater();
     RunMutex->unlock();
+
+    emit onDownloadFinished(this->Mp3);
 }

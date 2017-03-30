@@ -16,6 +16,7 @@
 #include <QThread>
 #include <QSpinBox>
 
+#include "deleteworker.h"
 #include "mp3.h"
 #include "downloadthread.h"
 
@@ -39,6 +40,7 @@ private slots:
     void on_pushButton_clicked();
 
     void onSuccessfulMyMusicRequest(QNetworkReply *reply);
+
     void onFailedRequest(QString errorText);
     void on_btnBrowse_clicked();
 
@@ -50,17 +52,21 @@ private slots:
     void on_tableWidget_doubleClicked(const QModelIndex &index);
 
     void on_spinDownloads_valueChanged(int arg1);
+    void onFileDeleted(MP3 *mp3);
 
+    void onSuccessfulDownload(MP3 *mp3);
 private:
     Ui::DLWindow *ui;
     Configuration *config;
     QThreadPool *downloadThreads;
+    DeleteWorker *deleteWorker;
 
     void displayXml(QByteArray xml);
     QList<MP3 *> mp3s;
     void populateListView();
     void startDownload(int row);
 
+    void deleteFromServer(MP3 *mp3);
 };
 
 #endif // DLWINDOW_H

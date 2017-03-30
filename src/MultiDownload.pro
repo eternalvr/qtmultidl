@@ -29,14 +29,16 @@ SOURCES += main.cpp\
     netmanager.cpp \
     configuration.cpp \
     mp3.cpp \
-    downloadthread.cpp
+    downloadthread.cpp \
+    deleteworker.cpp
 
 HEADERS  += dlwindow.h \
     logindialog.h \
     netmanager.h \
     configuration.h \
     mp3.h \
-    downloadthread.h
+    downloadthread.h \
+    deleteworker.h
 
 FORMS    += dlwindow.ui \
     logindialog.ui

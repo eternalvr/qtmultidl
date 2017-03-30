@@ -13,13 +13,15 @@
 #include <qevent.h>
 #include <qstring.h>
 #include <qvariant.h>
-
+#include <QThread>
 #include "configuration.h"
 
 class NetManager : public QObject
 {
 Q_OBJECT
 public:
+    static QThread *NMThread;
+
     bool debug = false;
     QNetworkAccessManager *manager;
     static NetManager* GetInstance();

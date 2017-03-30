@@ -9,17 +9,21 @@ DLWindow::DLWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->pbPrefab->setVisible(false);
 
+
+
 }
 void DLWindow::initialize()
 {
     downloadThreads = new QThreadPool(this);
     downloadThreads->setMaxThreadCount(5);
 
+    deleteWorker = new DeleteWorker();
+    connect(deleteWorker, &DeleteWorker::fileDeleted, this, &DLWindow::onFileDeleted);
+
     ui->txtSaveDir->setText(config->SaveDir);
     ui->spinDownloads->setValue(config->ConcurrentDownloads);
 
-    connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
-        this, SLOT(ShowTableContextMenu(const QPoint&)));
+    connect(ui->tableWidget, &QTableWidget::customContextMenuRequested, this, &DLWindow::ShowTableContextMenu);
 
     reloadMyMusic();
 }
@@ -186,6 +190,8 @@ void DLWindow::onSuccessfulMyMusicRequest(QNetworkReply *reply)
     }
 
 }
+
+
 void DLWindow::onFailedRequest(QString errorText)
 {
     NetManager *cInstance = NetManager::GetInstance();
@@ -211,6 +217,8 @@ void DLWindow::on_btnBrowse_clicked()
 void DLWindow::startDownload(int row)
 {
     DownloadThread *dlT = new DownloadThread();
+    connect(dlT, &DownloadThread::onDownloadFinished, this, &DLWindow::onSuccessfulDownload);
+
     QString session = ui->tableWidget->item(row, 4)->text();
 
     qDebug() << "Starting download for row " << row << endl;
@@ -269,6 +277,8 @@ void DLWindow::on_btnDownloadSelected_clicked()
             startDownload(item->row());
         }
     }
+
+
 }
 
 void DLWindow::on_tableWidget_doubleClicked(const QModelIndex &index)
@@ -282,4 +292,32 @@ void DLWindow::on_spinDownloads_valueChanged(int arg1)
         QThreadPool::globalInstance()->setMaxThreadCount(arg1);
         config->ConcurrentDownloads = arg1;
     }
+}
+
+void DLWindow::onFileDeleted(MP3 *mp3)
+{
+    for(int i = 0; i < ui->tableWidget->rowCount(); i++)
+    {
+        if(ui->tableWidget->item(i, 4)->text() == mp3->Session) {
+            ui->tableWidget->removeRow(i);
+            return;
+        }
+    }
+}
+
+void DLWindow::onSuccessfulDownload(MP3 *mp3)
+{
+    qDebug() << "Download successful: " << mp3->ToString() << endl;
+    if(ui->chkDeleteSuccessful->isChecked()) {
+        deleteFromServer(mp3);
+    }
+}
+void DLWindow::deleteFromServer(MP3 *mp3)
+{
+    qDebug() << "Deleting from Server: " << mp3->ToString() << endl;
+    if(!deleteWorker->isRunning()) { // delete Worker should be started with first delete request
+        deleteWorker->start();
+    }
+
+    deleteWorker->AddToQueue(mp3);
 }
