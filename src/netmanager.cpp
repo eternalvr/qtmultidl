@@ -10,11 +10,16 @@ NetManager *NetManager::GetInstance()
     }
     return instance;
 }
-
+void NetManager::SetPreferredThread(QThread *thread)
+{
+	preferredThread = thread;
+}
 NetManager::NetManager()
 {
-    manager = new QNetworkAccessManager();
-    manager->setCookieJar(new QNetworkCookieJar());
+	manager = new QNetworkAccessManager();
+	manager->setCookieJar(new QNetworkCookieJar());
+	preferredThread = QThread::currentThread();
+
 }
 NetManager::~NetManager()
 {
@@ -22,7 +27,8 @@ NetManager::~NetManager()
 }
 void NetManager::Get(QString url)
 {
-    SendRequest(url, "GET", NULL);
+	qDebug() << "[" << QThread::currentThread() << "] NetManager::GET";
+	SendRequest(url, "GET", NULL);
 }
 
 void NetManager::Post(QString url, QByteArray data)
@@ -32,10 +38,10 @@ void NetManager::Post(QString url, QByteArray data)
 
 void NetManager::SendRequest(QString url, QString method, QByteArray data)
 {
-
-    qDebug() << "Sending request to: " << url << endl;
+	
+	qDebug() << "Sending request to: " << url << endl;
     QNetworkRequest request;
-    QNetworkReply *reply = NULL;
+    reply = NULL;
 
     QSslConfiguration config = QSslConfiguration::defaultConfiguration();
 
@@ -48,6 +54,8 @@ void NetManager::SendRequest(QString url, QString method, QByteArray data)
     request.setRawHeader("X-Requested-With", "XMLHttpRequest");
     request.attribute(request.Attribute::FollowRedirectsAttribute, false);
     connect(manager, &QNetworkAccessManager::finished, this, &NetManager::syncRequestFinished);
+	
+	
 
     if(method == "POST") {
         request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -57,9 +65,16 @@ void NetManager::SendRequest(QString url, QString method, QByteArray data)
         reply = manager->get(request);
     }
 
+
+	//connect(reply, SIGNAL(QNetworkReply::error), this, &NetManager::onFailedRequest);
+
     if(debug == true){
         debugRequest(request, data);
     }
+}
+void NetManager::OnReplyError(QNetworkReply::NetworkError f)
+{
+    qDebug() << "ReplyError: " << f;
 }
 
 void NetManager::SetConfiguration(Configuration *config)
@@ -86,13 +101,11 @@ QString NetManager::GenerateUrl(QString path)
 
 void NetManager::syncRequestFinished(QNetworkReply *reply)
 {
-     disconnect(manager, &QNetworkAccessManager::finished, this, &NetManager::syncRequestFinished);
+	qDebug() << "NetManager::SyncRequestFinished";
+
+	disconnect(manager, &QNetworkAccessManager::finished, this, &NetManager::syncRequestFinished);
 
     if(reply->error() == QNetworkReply::NetworkError::NoError) {
-
-//        QByteArray response = reply->readAll();
-
-
         qDebug() << "Return code: " << reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt() << endl;
 
         emit onSuccessfulRequest(reply);

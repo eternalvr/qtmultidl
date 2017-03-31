@@ -14,11 +14,17 @@ DLWindow::DLWindow(QWidget *parent) :
 }
 void DLWindow::initialize()
 {
+	qDebug() << "[" << QThread::currentThread() << "] DLWindow::Initialize";
     downloadThreads = new QThreadPool(this);
     downloadThreads->setMaxThreadCount(5);
 
     deleteWorker = new DeleteWorker();
-    connect(deleteWorker, &DeleteWorker::fileDeleted, this, &DLWindow::onFileDeleted);
+	deleteWorker->setParent(this);
+
+	NetManager::GetInstance()->setParent(this);
+		
+
+	connect(deleteWorker, &DeleteWorker::fileDeleted, this, &DLWindow::onFileDeleted);
 
     ui->txtSaveDir->setText(config->SaveDir);
     ui->spinDownloads->setValue(config->ConcurrentDownloads);
@@ -87,7 +93,7 @@ void DLWindow::on_pushButton_clicked()
 
 void DLWindow::reloadMyMusic()
 {
-   NetManager *cInstance = NetManager::GetInstance();
+   NetManager *cInstance = NetManager::GetInstance(); 
 
    connect(cInstance, &NetManager::onSuccessfulRequest, this, &DLWindow::onSuccessfulMyMusicRequest);
    connect(cInstance, &NetManager::onFailedRequest, this, &DLWindow::onFailedRequest);
@@ -315,9 +321,6 @@ void DLWindow::onSuccessfulDownload(MP3 *mp3)
 void DLWindow::deleteFromServer(MP3 *mp3)
 {
     qDebug() << "Deleting from Server: " << mp3->ToString() << endl;
-    if(!deleteWorker->isRunning()) { // delete Worker should be started with first delete request
-        deleteWorker->start();
-    }
 
     deleteWorker->AddToQueue(mp3);
 }

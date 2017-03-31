@@ -7,7 +7,7 @@
 #include <QtNetwork/qsslconfiguration.h>
 #include <QtNetwork/qnetworkcookiejar.h>
 #include <QtNetwork/qnetworkcookie.h>
-
+#include <qapplication.h>
 #include <qjsonobject.h>
 #include <qjsondocument.h>
 #include <qevent.h>
@@ -15,6 +15,7 @@
 #include <qvariant.h>
 #include <QThread>
 #include "configuration.h"
+#include <QNetworkReply>
 
 class NetManager : public QObject
 {
@@ -25,6 +26,10 @@ public:
     bool debug = false;
     QNetworkAccessManager *manager;
     static NetManager* GetInstance();
+
+
+
+	void SetPreferredThread(QThread * thread);
 
     NetManager();
     ~NetManager();
@@ -44,12 +49,15 @@ private:
     void debugRequest(QNetworkRequest request, QByteArray data);
     void saveAutoLogin(QString val);
     QSettings *getSettings();
+	QThread *preferredThread;
+    QNetworkReply *reply;
 
     Configuration *config;
 private slots:
     void syncRequestFinished(QNetworkReply *reply);
 
 
+    void OnReplyError(QNetworkReply::NetworkError f);
 };
 
 #endif // NETMANAGER_H

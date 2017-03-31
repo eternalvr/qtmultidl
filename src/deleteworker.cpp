@@ -2,25 +2,39 @@
 
 DeleteWorker::DeleteWorker()
 {
-    runMutex = new QMutex();
+	qDebug() << "[" << QThread::currentThreadId() << "] DeleteWorker::DeletWorker()";
+	runMutex = new QMutex();
     deleteQueue = new QQueue<MP3*>();
-    workerActive = true;
+    workerActive = false;
+
+	intervalTimer = new QTimer();
+	
+	connect(intervalTimer, &QTimer::timeout, this, &DeleteWorker::run);
+	
+
+	intervalTimer->setInterval(10000);
+	intervalTimer->start();
+
+	
 }
 
 void DeleteWorker::run()
 {
-    while(workerActive){
-        while(!deleteQueue->isEmpty()){
-            currentMP3 = deleteQueue->dequeue();
+	qDebug() << "[" << QThread::currentThreadId() << "] DeleteWorker::run";
+	
+        
+		while(!deleteQueue->isEmpty()){
+			runMutex->tryLock(30000);
+			currentMP3 = deleteQueue->dequeue();
             if(currentMP3 != NULL){
-                runMutex->tryLock(10000);
+                
                 qDebug() << "Deleting MP3: " << currentMP3->ToString() << endl;
                 deleteFromServer(currentMP3);
 
             }
         }
 
-    }
+    
 }
 
 void DeleteWorker::AddToQueue(MP3 *mp3)
@@ -29,12 +43,14 @@ void DeleteWorker::AddToQueue(MP3 *mp3)
 }
 void DeleteWorker::connectHooks()
 {
+	qDebug() << "[+] Hooks";
     NetManager *cInstance = NetManager::GetInstance();
     connect(cInstance, &NetManager::onSuccessfulRequest, this, &DeleteWorker::onSuccessfulDeleteMusicRequest);
     connect(cInstance, &NetManager::onFailedRequest, this, &DeleteWorker::onFailedRequest);
 }
 void DeleteWorker::disconnectHooks()
 {
+	qDebug() << "[-] Hooks";
     NetManager *cInstance = NetManager::GetInstance();
     disconnect(cInstance, &NetManager::onSuccessfulRequest, this, &DeleteWorker::onSuccessfulDeleteMusicRequest);
     disconnect(cInstance, &NetManager::onFailedRequest, this, &DeleteWorker::onFailedRequest);
@@ -53,9 +69,9 @@ void DeleteWorker::SetActive(bool active)
 void DeleteWorker::onSuccessfulDeleteMusicRequest(QNetworkReply *reply)
 {
     disconnectHooks();
-
     int code = reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
-    if(code == 200) {
+	qDebug() << "DeleteMusicRequest: Code " << code;
+	if(code == 200) {
 
         QString response(reply->readAll());
 
@@ -69,8 +85,8 @@ void DeleteWorker::onSuccessfulDeleteMusicRequest(QNetworkReply *reply)
 void DeleteWorker::deleteFromServer(MP3 *mp3)
 {
     NetManager *cInstance = NetManager::GetInstance();
-    cInstance->moveToThread(this);
-    cInstance->Get(cInstance->GenerateUrl(QString("/system/xextdelete/sess/%1").arg(mp3->Session)));
+    connectHooks();
+    cInstance->Get(cInstance->GenerateUrl(QString("/system/extdelete/sess/%1").arg(mp3->Session)));
 }
 void DeleteWorker::onFailedRequest(QString errorText)
 {
