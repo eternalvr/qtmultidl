@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/default">
+        <file>images/delete.png</file>
+        <file>images/folder.png</file>
+        <file>images/hourglass_delete.png</file>
+        <file>images/hourglass_go.png</file>
+        <file>images/hourglass_link.png</file>
+        <file>images/music.png</file>
+        <file>images/resultset_first.png</file>
+        <file>images/resultset_last.png</file>
+        <file>images/resultset_next.png</file>
+        <file>images/resultset_previous.png</file>
+        <file>images/stop.png</file>
+        <file>images/transmit.png</file>
+        <file>images/transmit_add.png</file>
+        <file>images/transmit_delete.png</file>
+        <file>images/transmit_edit.png</file>
+        <file>images/transmit_error.png</file>
+        <file>images/transmit_go.png</file>
+        <file>images/user.png</file>
+        <file>images/user_delete.png</file>
+    </qresource>
+</RCC>

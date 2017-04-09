@@ -4,7 +4,7 @@ DeleteWorker::DeleteWorker()
 {
 	qDebug() << "[" << QThread::currentThreadId() << "] DeleteWorker::DeletWorker()";
 	runMutex = new QMutex();
-    deleteQueue = new QQueue<MP3*>();
+    deleteQueue = new QQueue<MP3>();
     workerActive = false;
 
 	intervalTimer = new QTimer();
@@ -12,32 +12,25 @@ DeleteWorker::DeleteWorker()
 	connect(intervalTimer, &QTimer::timeout, this, &DeleteWorker::run);
 	
 
-	intervalTimer->setInterval(10000);
+    intervalTimer->setInterval(1000);
 	intervalTimer->start();
 
 	
 }
 
 void DeleteWorker::run()
-{
-	qDebug() << "[" << QThread::currentThreadId() << "] DeleteWorker::run";
-	
-        
-		while(!deleteQueue->isEmpty()){
-			runMutex->tryLock(30000);
-			currentMP3 = deleteQueue->dequeue();
-            if(currentMP3 != NULL){
-                
-                qDebug() << "Deleting MP3: " << currentMP3->ToString() << endl;
-                deleteFromServer(currentMP3);
+{       
+        if(!deleteQueue->isEmpty()){
 
+			currentMP3 = deleteQueue->dequeue();
+            if(currentMP3.Session != ""){
+                qDebug() << "Deleting MP3: " << currentMP3.ToString() << endl;
+                deleteFromServer(currentMP3);
             }
         }
-
-    
 }
 
-void DeleteWorker::AddToQueue(MP3 *mp3)
+void DeleteWorker::AddToQueue(MP3 mp3)
 {
         deleteQueue->enqueue(mp3);
 }
@@ -77,16 +70,16 @@ void DeleteWorker::onSuccessfulDeleteMusicRequest(QNetworkReply *reply)
 
         if(response == "true"){
             emit fileDeleted(currentMP3);
-            runMutex->unlock();
         }
 
     }
 }
-void DeleteWorker::deleteFromServer(MP3 *mp3)
+
+void DeleteWorker::deleteFromServer(MP3 mp3)
 {
     NetManager *cInstance = NetManager::GetInstance();
     connectHooks();
-    cInstance->Get(cInstance->GenerateUrl(QString("/system/extdelete/sess/%1").arg(mp3->Session)));
+    cInstance->Get(cInstance->GenerateUrl(QString("/system/extdelete/sess/%1").arg(mp3.Session)));
 }
 void DeleteWorker::onFailedRequest(QString errorText)
 {

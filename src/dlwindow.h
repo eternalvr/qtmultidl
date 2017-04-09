@@ -35,6 +35,8 @@ public:
     static bool loggedIn;
     void SetConfiguration(Configuration *config);
     void reloadMyMusic();
+signals:
+    void cancelDownload(QString session);
 
 private slots:
     void on_pushButton_clicked();
@@ -52,21 +54,34 @@ private slots:
     void on_tableWidget_doubleClicked(const QModelIndex &index);
 
     void on_spinDownloads_valueChanged(int arg1);
-    void onFileDeleted(MP3 *mp3);
+    void onFileDeleted(MP3 mp3);
 
-    void onSuccessfulDownload(MP3 *mp3);
+    void onSuccessfulDownload(MP3 mp3);
+    void onFailedDownload(MP3 mp3);
+
 private:
+    const int PROGRESSBAR_COLUMN = 3;
+    const int SESSION_COLUMN = 4;
+
     Ui::DLWindow *ui;
     Configuration *config;
     QThreadPool *downloadThreads;
     DeleteWorker *deleteWorker;
+    QAction *actionDownloadStart;
+    QAction *actionDownloadDelete;
+    QAction *actionDownloadCancel;
+    QAction *actionDownloadReset;
+
 
     void displayXml(QByteArray xml);
     QList<MP3 *> mp3s;
     void populateListView();
     void startDownload(int row);
 
-    void deleteFromServer(MP3 *mp3);
+    void deleteFromServer(MP3 mp3);
+    void createContextMenuActions();
+    bool findMp3BySession(QString session, MP3* &mp3);
+    void MarkRowDisabled(int row);
 };
 
 #endif // DLWINDOW_H

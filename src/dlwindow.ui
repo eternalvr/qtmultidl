@@ -11,7 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DLWindow</string>
+   <string>Multi Download</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="documentMode">
+   <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QTableWidget" name="tableWidget">
@@ -65,18 +71,18 @@
     <property name="sortingEnabled">
      <bool>true</bool>
     </property>
+    <property name="cornerButtonEnabled">
+     <bool>false</bool>
+    </property>
     <property name="columnCount">
-     <number>3</number>
+     <number>0</number>
     </property>
     <attribute name="horizontalHeaderVisible">
-     <bool>false</bool>
+     <bool>true</bool>
     </attribute>
     <attribute name="verticalHeaderVisible">
      <bool>false</bool>
     </attribute>
-    <column/>
-    <column/>
-    <column/>
    </widget>
    <widget class="QProgressBar" name="pbPrefab">
     <property name="enabled">
@@ -153,6 +159,10 @@ border: 1px solid black;
     <property name="text">
      <string>Alles Herunterladen</string>
     </property>
+    <property name="icon">
+     <iconset resource="icons.qrc">
+      <normaloff>:/default/images/transmit_go.png</normaloff>:/default/images/transmit_go.png</iconset>
+    </property>
    </widget>
    <widget class="QLineEdit" name="txtSaveDir">
     <property name="geometry">
@@ -186,6 +196,13 @@ border: 1px solid black;
     </property>
     <property name="text">
      <string>...</string>
+    </property>
+    <property name="icon">
+     <iconset resource="icons.qrc">
+      <normaloff>:/default/images/folder.png</normaloff>:/default/images/folder.png</iconset>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -238,31 +255,46 @@ border: 1px solid black;
      <rect>
       <x>20</x>
       <y>480</y>
-      <width>21</width>
+      <width>251</width>
       <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>Titel nach erfolgreichem Download löschen</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="lblLoading">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>470</y>
-      <width>151</width>
-      <height>70</height>
+      <x>170</x>
+      <y>160</y>
+      <width>291</width>
+      <height>111</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: #ddd; border-radius: 5px;</string>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
+    </property>
     <property name="text">
-     <string>Nach erfolgreichem Download Titel aus dem Speicher löschen</string>
+     <string>Musikliste wird geladen ..</string>
     </property>
     <property name="scaledContents">
      <bool>false</bool>
     </property>
-    <property name="wordWrap">
-     <bool>true</bool>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>
@@ -275,6 +307,24 @@ border: 1px solid black;
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuDatei">
+    <property name="title">
+     <string>Datei</string>
+    </property>
+    <addaction name="action_Ausloggen"/>
+    <addaction name="separator"/>
+    <addaction name="action_Beenden"/>
+   </widget>
+   <widget class="QMenu" name="menuExtas">
+    <property name="title">
+     <string>Extras</string>
+    </property>
+    <addaction name="actionAlles_Herunterladen"/>
+    <addaction name="separator"/>
+    <addaction name="actionAlles_L_schen"/>
+   </widget>
+   <addaction name="menuDatei"/>
+   <addaction name="menuExtas"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -285,8 +335,58 @@ border: 1px solid black;
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_Ausloggen">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/default/images/user_delete.png</normaloff>:/default/images/user_delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Ausloggen</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F4</string>
+   </property>
+  </action>
+  <action name="action_Beenden">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/default/images/delete.png</normaloff>:/default/images/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Beenden</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionAlles_Herunterladen">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/default/images/transmit_go.png</normaloff>:/default/images/transmit_go.png</iconset>
+   </property>
+   <property name="text">
+    <string>Alles Herunterladen</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionAlles_L_schen">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/default/images/transmit_error.png</normaloff>:/default/images/transmit_error.png</iconset>
+   </property>
+   <property name="text">
+    <string>Alles Löschen</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Del</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

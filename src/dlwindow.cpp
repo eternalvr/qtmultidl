@@ -9,9 +9,18 @@ DLWindow::DLWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->pbPrefab->setVisible(false);
 
-
+    createContextMenuActions();
 
 }
+
+void DLWindow::createContextMenuActions()
+{
+    actionDownloadCancel = new QAction("Download abbrechen");
+    actionDownloadDelete = new QAction("Aus dem Speicherplatz löschen");
+    actionDownloadStart = new QAction("Download starten");
+    actionDownloadReset = new QAction("Download zurücksetzen");
+}
+
 void DLWindow::initialize()
 {
 	qDebug() << "[" << QThread::currentThread() << "] DLWindow::Initialize";
@@ -28,11 +37,23 @@ void DLWindow::initialize()
 
     ui->txtSaveDir->setText(config->SaveDir);
     ui->spinDownloads->setValue(config->ConcurrentDownloads);
+    downloadThreads->setMaxThreadCount(config->ConcurrentDownloads);
 
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested, this, &DLWindow::ShowTableContextMenu);
 
     reloadMyMusic();
 }
+void DLWindow::MarkRowDisabled(int row)
+{
+    for(int i = 0; i < ui->tableWidget->columnCount();i++)
+    {
+        QTableWidgetItem *item = ui->tableWidget->item(row, i);
+        if(item != NULL) {
+            item->setFlags(!Qt::ItemIsSelectable & !Qt::ItemIsEnabled );
+        }
+    }
+}
+
 void DLWindow::ShowTableContextMenu(const QPoint &point)
 {
         QPoint globalPos = ui->tableWidget->viewport()->mapToGlobal(point);
@@ -43,36 +64,70 @@ void DLWindow::ShowTableContextMenu(const QPoint &point)
 
         if(items.count() > 0) {
 
-            QProgressBar *pb = (QProgressBar*) ui->tableWidget->cellWidget(items.at(0)->row(), 3);
+            QProgressBar *pb = (QProgressBar*) ui->tableWidget->cellWidget(items.at(0)->row(), PROGRESSBAR_COLUMN);
 
             if(pb->value() <= 0) {
-                myMenu.addAction("Download starten");
+                myMenu.addAction(actionDownloadStart);
             } else if (pb->value() > 0 && pb->value() < pb->maximum()) {
-                myMenu.addAction("Download abbrechen");
-                myMenu.addAction("Download zurücksetzen");
+                myMenu.addAction(actionDownloadCancel);
+                myMenu.addAction(actionDownloadReset);
             } else {
-                myMenu.addAction("Download zurücksetzen");
+                myMenu.addAction(actionDownloadReset);
             }
 
 
             myMenu.addSeparator();
-            myMenu.addAction("Aus dem Speicherplatz löschen");
+            myMenu.addAction(actionDownloadDelete);
         }
-
-
-
-
-
 
         QAction* selectedItem = myMenu.exec(globalPos);
         if (selectedItem)
         {
-            // something was chosen, do stuff
+            if(selectedItem == actionDownloadStart){
+                on_btnDownloadSelected_clicked();
+            }
+            if(selectedItem == actionDownloadDelete){
+                QList<QTableWidgetItem *> selectedItems = ui->tableWidget->selectedItems();
+                foreach (QTableWidgetItem *item, selectedItems) {
+                    QString session = ui->tableWidget->item(item->row(), 4)->text();
+                    if(item->column() == 0) {
+                        MP3 *mp3 = NULL;
+                        if(findMp3BySession(session, mp3)){
+                            QMessageBox *msgBox = new QMessageBox(QMessageBox::Icon::Question, "Vom Server löschen", "Soll der Titel \n\n" + mp3->Artist + " - " + mp3->Track + "\n\nwirklich vom Server gelöscht werden?", QMessageBox::Yes|QMessageBox::No);
+                            msgBox->setButtonText(QMessageBox::Button::Yes, "Ja");
+                            msgBox->setButtonText(QMessageBox::Button::No, "Nein");
+                            if(QMessageBox::Yes == msgBox->exec()){
+                                QProgressBar *pb = static_cast<QProgressBar *>(ui->tableWidget->cellWidget(item->row(),PROGRESSBAR_COLUMN));
+                                pb->setFormat("wird gelöscht..");
+                                pb->setRange(0,0);
+                                pb->setValue(-1);
+                                pb->setEnabled(true);
+                                deleteFromServer(*mp3);
+                                MarkRowDisabled(item->row());
+                            }
+                            msgBox->deleteLater();
+                        }
+                    }
+                }
+
+            }
+            if(selectedItem == actionDownloadReset) {
+                QList<QTableWidgetItem *> selectedItems = ui->tableWidget->selectedItems();
+                foreach (QTableWidgetItem *item, selectedItems) {
+                    ((QProgressBar *)ui->tableWidget->cellWidget(item->row(), PROGRESSBAR_COLUMN))->setValue(0);
+                    cancelDownload(ui->tableWidget->item(item->row(), SESSION_COLUMN)->text());
+                }
+            }
+            if(selectedItem == actionDownloadCancel) {
+                QList<QTableWidgetItem *> selectedItems = ui->tableWidget->selectedItems();
+                foreach (QTableWidgetItem *item, selectedItems) {
+                    if(item->column() == 0) {
+                        emit cancelDownload(ui->tableWidget->item(item->row(), 4)->text());
+                    }
+                }
+            }
         }
-        else
-        {
-            // nothing was chosen
-        }
+
 }
 
 void DLWindow::SetConfiguration(Configuration *config)
@@ -110,7 +165,9 @@ void DLWindow::displayXml(QByteArray xml)
     int elements = nodeList.count();
 
     if(elements == 0) {
-        QMessageBox::warning(this, "Fehler beim Abruf", "Die Anfrage konnte nicht ausgeführt werden. \n\n Bitte probieren Sie es später erneut." ,QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Ok);
+        //QMessageBox::warning(this, "Fehler beim Abruf", "Die Anfrage konnte nicht ausgeführt werden. \n\n Bitte probieren Sie es später erneut." ,QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Ok);
+        ui->lblLoading->setText("Es konnten keine Musikstücke gefunden werden. Bitte probieren Sie es später erneut.");
+        return;
     }
     mp3s.clear();
 
@@ -125,6 +182,20 @@ void DLWindow::displayXml(QByteArray xml)
     }
 
     populateListView();
+}
+bool DLWindow::findMp3BySession(QString session, MP3* &mp3)
+{
+    if(mp3s.count() == 0) {
+        return false;
+    }
+
+    for(int i = 0; i < mp3s.count(); i++) {
+        if(mp3s.at(i)->Session == session){
+          mp3 = (mp3s.at(i));
+          return true;
+        }
+    }
+    return false;
 }
 
 void DLWindow::populateListView()
@@ -163,7 +234,7 @@ void DLWindow::populateListView()
         qp->setVisible(true);
         qp->setTextVisible(true);
 
-        ui->tableWidget->setCellWidget(row, 3, qp);
+        ui->tableWidget->setCellWidget(row, PROGRESSBAR_COLUMN, qp);
         //qp->resize(cellwidth, 15);
 
 
@@ -171,7 +242,7 @@ void DLWindow::populateListView()
 
         row++;
     }
-
+    this->ui->lblLoading->setVisible(false);
 }
 
 void DLWindow::onSuccessfulMyMusicRequest(QNetworkReply *reply)
@@ -224,6 +295,8 @@ void DLWindow::startDownload(int row)
 {
     DownloadThread *dlT = new DownloadThread();
     connect(dlT, &DownloadThread::onDownloadFinished, this, &DLWindow::onSuccessfulDownload);
+    connect(dlT, &DownloadThread::onDownloadCancelled, this, &DLWindow::onFailedDownload);
+
 
     QString session = ui->tableWidget->item(row, 4)->text();
 
@@ -231,13 +304,15 @@ void DLWindow::startDownload(int row)
 
     for(int i = 0; i < mp3s.count(); i++) {
         if(mp3s.at(i)->Session == session){
-           dlT->Mp3 = mp3s.at(i);
-           dlT->progressBar = (QProgressBar *)ui->tableWidget->cellWidget(row, 3);
+           dlT->Mp3 = *mp3s.at(i);
+           dlT->progressBar = (QProgressBar *)ui->tableWidget->cellWidget(row, PROGRESSBAR_COLUMN);
            dlT->DownloadDirectory = config->SaveDir;           
            if(dlT->progressBar->value() == dlT->progressBar->maximum()){
                continue;
            }
-           QThreadPool::globalInstance()->start(dlT);
+           connect(this, &DLWindow::cancelDownload, dlT, &DownloadThread::onCancelDownload);
+
+           downloadThreads->start(dlT);
         }
     }
 }
@@ -295,32 +370,37 @@ void DLWindow::on_tableWidget_doubleClicked(const QModelIndex &index)
 void DLWindow::on_spinDownloads_valueChanged(int arg1)
 {
     if(arg1 > 0){
-        QThreadPool::globalInstance()->setMaxThreadCount(arg1);
+        downloadThreads->setMaxThreadCount(arg1);
         config->ConcurrentDownloads = arg1;
     }
 }
 
-void DLWindow::onFileDeleted(MP3 *mp3)
+void DLWindow::onFileDeleted(MP3 mp3)
 {
     for(int i = 0; i < ui->tableWidget->rowCount(); i++)
     {
-        if(ui->tableWidget->item(i, 4)->text() == mp3->Session) {
+        if(ui->tableWidget->item(i, 4)->text() == mp3.Session) {
             ui->tableWidget->removeRow(i);
             return;
         }
     }
 }
 
-void DLWindow::onSuccessfulDownload(MP3 *mp3)
+void DLWindow::onSuccessfulDownload(MP3 mp3)
 {
-    qDebug() << "Download successful: " << mp3->ToString() << endl;
+    qDebug() << "Download successful: " << mp3.ToString() << endl;
     if(ui->chkDeleteSuccessful->isChecked()) {
         deleteFromServer(mp3);
     }
 }
-void DLWindow::deleteFromServer(MP3 *mp3)
+
+void DLWindow::onFailedDownload(MP3 mp3)
 {
-    qDebug() << "Deleting from Server: " << mp3->ToString() << endl;
+    qDebug() << "Download NOT successful: " << mp3.ToString() << endl;
+}
+void DLWindow::deleteFromServer(MP3 mp3)
+{
+    qDebug() << "Deleting from Server: " << mp3.ToString() << endl;
 
     deleteWorker->AddToQueue(mp3);
 }

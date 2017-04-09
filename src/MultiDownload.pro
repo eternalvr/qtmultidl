@@ -51,3 +51,6 @@ win{
 
 DISTFILES += \
     fileview.qml
+
+RESOURCES += \
+    icons.qrc

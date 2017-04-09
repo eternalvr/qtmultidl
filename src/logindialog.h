@@ -11,6 +11,7 @@
 #include <qjsonobject.h>
 #include <qjsondocument.h>
 #include <qevent.h>
+#include <QRegExp>
 
 #include <qpushbutton.h>
 

@@ -10,8 +10,10 @@
 #include <QString>
 #include <QStringList>
 #include <QTimer>
+#include <QThread>
 #include <stdio.h>
 #include <QFile>
+#include <QTemporaryFile>
 #include <QTime>
 #include <QDir>
 #include <QMutex>
@@ -27,9 +29,11 @@ class DownloadThread : public QObject, public QRunnable
 
 public:
     DownloadThread();
-    MP3 *Mp3;
+    ~DownloadThread();
+
+    MP3 Mp3;
     QProgressBar *progressBar;
-    QFile *outputFile;
+    QTemporaryFile *outputFile;
     QString DownloadDirectory;
 
 
@@ -42,18 +46,23 @@ protected:
 
     QTime downloadTime;
 private:
+    QString getTempFilename();
     QString getFileName(MP3 *mp3);
     QMutex *RunMutex;
 
 signals:
     void onStartDownload();
-    void onDownloadFinished(MP3 *mp3);
+    void onDownloadFinished(MP3 mp3);
+    void onDownloadCancelled(MP3 mp3);
 
 private slots:
     void downloadStart();
     void downloadReadyRead();
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
     void downloadFinished();
+public slots:
+    void onCancelDownload(QString session);
+
 };
 
 #endif // DOWNLOADTHREAD_H

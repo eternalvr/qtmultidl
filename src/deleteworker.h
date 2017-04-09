@@ -20,12 +20,12 @@ class DeleteWorker : public QThread
 public:
 	DeleteWorker();
 	void run();
-	void AddToQueue(MP3 *mp3);
+    void AddToQueue(MP3 mp3);
 
 private:
 	QMutex *runMutex;
-	QQueue<MP3*> *deleteQueue;
-	MP3 *currentMP3;
+    QQueue<MP3> *deleteQueue;
+    MP3 currentMP3;
 	bool workerActive;
 
 	void connectHooks();
@@ -34,7 +34,7 @@ private:
 	bool IsActive();
 	void SetActive(bool active);
 
-	void deleteFromServer(MP3 *mp3);
+    void deleteFromServer(MP3 mp3);
 	QTimer *intervalTimer;
 
 private slots:
@@ -42,7 +42,7 @@ private slots:
 	void onSuccessfulDeleteMusicRequest(QNetworkReply *reply);
 
 signals:
-	void fileDeleted(MP3 *mp3);
+    void fileDeleted(MP3 mp3);
 };
 
 #endif // DELETEWORKER_H

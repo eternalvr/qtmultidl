@@ -29,11 +29,21 @@ LoginDialog::~LoginDialog()
 }
 void LoginDialog::accept()
 {
+    if (ui->txtHost->text().startsWith("https")){
+        ui->chkSSL->setChecked(true);
+    }
+    if(ui->txtHost->text().startsWith("http")){
+        ui->txtHost->setText(ui->txtHost->text().replace(QRegExp("^http[s]?://"), ""));
+    }
+
     config->Hostname = ui->txtHost->text().trimmed();
+
     config->UseSSL = (ui->chkSSL->checkState() == Qt::CheckState::Checked);
     checkLogin();
 }
 void LoginDialog::reject() {
+    config->AutoLogin = "";
+    config->Save();
 
     QDialog::reject();
 }

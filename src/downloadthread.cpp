@@ -6,18 +6,23 @@ DownloadThread::DownloadThread()
     RunMutex = new QMutex(QMutex::NonRecursive);
 }
 
+DownloadThread::~DownloadThread()
+{
+    disconnect();
+}
+
 void DownloadThread::run()
 {
 
-       QString filename = getFileName(this->Mp3);
 
-       outputFile = new QFile(filename);
-       if (!outputFile->open(QIODevice::WriteOnly)) {
-           qDebug() << "Error opening file: " << filename << endl;
+
+       outputFile = new QTemporaryFile();
+       if (!outputFile->open()) {
+           qDebug() << "Error opening file: " << outputFile->fileName() << endl;
 
            return;
        }
-       request = new QNetworkRequest(Mp3->Url);
+       request = new QNetworkRequest(Mp3.Url);
 
        connect(this, &DownloadThread::onStartDownload, this, &DownloadThread::downloadStart);
        RunMutex->lock();
@@ -27,22 +32,25 @@ void DownloadThread::run()
        RunMutex->tryLock(20000000);
 }
 
+
+
 QString DownloadThread::getFileName(MP3 *mp3)
 {
 
-    QString basename = this->DownloadDirectory + QDir::separator() + mp3->Artist + " - " + mp3->Track + ".mp3";
+    QString basename = this->DownloadDirectory + QDir::separator() + mp3->Artist + " - " + mp3->Track;
 
 
-    if (QFile::exists(basename)) {
+
+    if (QFile::exists(basename + ".mp3")) {
         int i = 0;
         basename += '.';
-        while (QFile::exists(basename + QString::number(i)))
+        while (QFile::exists(basename + QString::number(i) + ".mp3"))
             ++i;
 
         basename += QString::number(i);
     }
 
-    return basename;
+    return basename + ".mp3";
 }
 
 void DownloadThread::downloadStart()
@@ -84,18 +92,35 @@ void DownloadThread::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 }
 void DownloadThread::downloadFinished()
 {
+    qDebug() << "[" << QThread::currentThread() << "] DownloadThread::downloadFinished";
     progressBar->setValue(progressBar->maximum());
     progressBar->setFormat("%p%");
-    outputFile->close();
 
-    outputFile->deleteLater();
-
-    if (currentDownload->error()) {
-        progressBar->setFormat("Download Error");
-    }
 
     currentDownload->deleteLater();
-    RunMutex->unlock();
+
+
+    if (currentDownload->error()) {
+        outputFile->remove();
+        emit onDownloadCancelled(this->Mp3);
+        RunMutex->unlock();
+        return;
+    }
+    outputFile->close();
+    outputFile->rename(getFileName(&this->Mp3));
+    outputFile->setAutoRemove(false);
+    outputFile->deleteLater();
+
 
     emit onDownloadFinished(this->Mp3);
+    RunMutex->unlock();
+}
+
+void DownloadThread::onCancelDownload(QString session)
+{
+    qDebug() << "[" << QThread::currentThread() << "] DownloadThread::onCancelDownload";
+    if(this->Mp3.Session == session || session == "all"){
+        if(currentDownload->isRunning())
+            this->currentDownload->abort();
+    }
 }
