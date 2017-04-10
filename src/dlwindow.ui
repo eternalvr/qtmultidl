@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Multi Download</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
+    <normaloff>:/default/images/cloud.png</normaloff>:/default/images/cloud.png</iconset>
+  </property>
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
@@ -320,8 +324,6 @@ border: 1px solid black;
      <string>Extras</string>
     </property>
     <addaction name="actionAlles_Herunterladen"/>
-    <addaction name="separator"/>
-    <addaction name="actionAlles_L_schen"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuExtas"/>

@@ -7,6 +7,7 @@ int main(int argc, char *argv[])
    QApplication a(argc, argv);
    LoginDialog ld;
    DLWindow w;
+   ld.setWindowIcon(w.windowIcon());
 
    Configuration *c = new Configuration();
 

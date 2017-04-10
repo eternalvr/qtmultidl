@@ -10,7 +10,6 @@ DLWindow::DLWindow(QWidget *parent) :
     ui->pbPrefab->setVisible(false);
 
     createContextMenuActions();
-
 }
 
 void DLWindow::createContextMenuActions()
@@ -19,13 +18,35 @@ void DLWindow::createContextMenuActions()
     actionDownloadDelete = new QAction("Aus dem Speicherplatz löschen");
     actionDownloadStart = new QAction("Download starten");
     actionDownloadReset = new QAction("Download zurücksetzen");
+
+    connect(this->ui->action_Ausloggen, &QAction::triggered, this, &DLWindow::onMenuLogoutClick);
+    connect(this->ui->action_Beenden, &QAction::triggered, this, &DLWindow::close);
+    connect(this->ui->actionAlles_Herunterladen, &QAction::triggered, this, &DLWindow::on_btnDownloadAll_clicked);
+    connect(this->ui->actionAlles_L_schen, &QAction::triggered, this, &DLWindow::onDeleteAllClicked);
+}
+void DLWindow::onDeleteAllClicked()
+{
+    QMessageBox *msgBox = new QMessageBox(QMessageBox::Icon::Question, "ACHTUNG!", "Es werden _ALLE_ in der Liste angezeigten Titel aus dem Onlinespeicher gelöscht. Möchten Sie das wirklich?", QMessageBox::Yes|QMessageBox::No);
+    msgBox->setButtonText(QMessageBox::Button::Yes, "Ja");
+    msgBox->setButtonText(QMessageBox::Button::No, "Nein");
+    if(QMessageBox::Yes == msgBox->exec()){
+        // we don't do this
+    }
+}
+void DLWindow::onMenuLogoutClick()
+{
+    QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
+    config->AutoLogin = "";
+    config->Save();
+
+    this->close();
 }
 
 void DLWindow::initialize()
 {
 	qDebug() << "[" << QThread::currentThread() << "] DLWindow::Initialize";
     downloadThreads = new QThreadPool(this);
-    downloadThreads->setMaxThreadCount(5);
+    downloadThreads->setMaxThreadCount(config->ConcurrentDownloads);
 
     deleteWorker = new DeleteWorker();
 	deleteWorker->setParent(this);
@@ -37,7 +58,6 @@ void DLWindow::initialize()
 
     ui->txtSaveDir->setText(config->SaveDir);
     ui->spinDownloads->setValue(config->ConcurrentDownloads);
-    downloadThreads->setMaxThreadCount(config->ConcurrentDownloads);
 
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested, this, &DLWindow::ShowTableContextMenu);
 
@@ -205,11 +225,12 @@ void DLWindow::populateListView()
     ui->tableWidget->setRowCount(mp3s.count());
 
     ui->tableWidget->setColumnHidden(2, true); // hide url
-    ui->tableWidget->setColumnHidden(4, true); // hide session
+    ui->tableWidget->setColumnHidden(SESSION_COLUMN, true); // hide session
 
 
     QStringList labels("Interpret");
     labels.append("Titel");
+    labels.append("");
 
     ui->tableWidget->setHorizontalHeaderLabels(labels);
 

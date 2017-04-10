@@ -19,5 +19,6 @@
         <file>images/transmit_go.png</file>
         <file>images/user.png</file>
         <file>images/user_delete.png</file>
+        <file>images/cloud.png</file>
     </qresource>
 </RCC>
