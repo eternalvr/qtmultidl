@@ -5,8 +5,6 @@ Multidownload is a tool to simplify the download of multiple files from several 
 ### Download
 
 ##### Version 0.8 - first Beta
-#
-##
 Windows: [MultiDownloadSetup](https://github.com/eternalvr/qtmultidl/releases/download/rel_0.8/MultiDownload0.8-Setup.exe) 24,4MB
 
 ### First Setup
