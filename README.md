@@ -6,7 +6,10 @@ Multidownload is a tool to simplify the download of multiple files from several 
 
 ##### Version 0.8 - first Beta
 Windows: [MultiDownloadSetup](https://github.com/eternalvr/qtmultidl/releases/download/rel_0.8/MultiDownload0.8-Setup.exe) 36,1MB
+
 Mac OSX: [MultiDownload.dmg](https://github.com/eternalvr/qtmultidl/releases/download/rel_0.8/MultiDownload.dmg) 9.68MB
+
+
 ### First Setup
 
 * Start MultiDownload
