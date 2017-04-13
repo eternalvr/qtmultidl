@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>MultiDownload</Name>
+    <Version>0.8</Version>
+    <Title>MultiDownload Installer</Title>
+    <Publisher>VR</Publisher>
+    <ProductUrl>http://www.github.com/eternalvr/qtmultidl</ProductUrl>
+    <StartMenuDir>MultiDownload</StartMenuDir>
+    <TargetDir>@ApplicationsDir@/MultiDownload</TargetDir>
+    <RunProgram>@TargetDir@/MultiDownload</RunProgram>
+    <MaintenanceToolName>uninstall</MaintenanceToolName>
+</Installer>

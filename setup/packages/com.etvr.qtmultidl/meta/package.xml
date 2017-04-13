@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>MultiDownload</DisplayName>
+    <Description>Kernkomponenten</Description>
+    <Version>0.8.0</Version>
+    <ReleaseDate>2017-04-10</ReleaseDate>
+    <Default>true</Default>
+    <Licenses>
+        <License name="GPLv3" file="LICENSE" />
+    </Licenses>
+    <Script>install.qs</Script>
+</Package>
