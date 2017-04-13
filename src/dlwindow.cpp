@@ -69,7 +69,8 @@ void DLWindow::MarkRowDisabled(int row)
     {
         QTableWidgetItem *item = ui->tableWidget->item(row, i);
         if(item != NULL) {
-            item->setFlags(!Qt::ItemIsSelectable & !Qt::ItemIsEnabled );
+            Qt::ItemFlags f(!Qt::ItemIsSelectable & !Qt::ItemIsEnabled);
+            item->setFlags( f );
         }
     }
 }
