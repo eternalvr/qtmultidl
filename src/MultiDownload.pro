@@ -22,7 +22,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 SOURCES += main.cpp\
         dlwindow.cpp \
     logindialog.cpp \
@@ -48,6 +47,7 @@ win{
     LIBS += -LC:/OpenSSL-Win32/lib -lubsec
     INCLUDEPATH += C:/OpenSSL-Win32/include
 }
+win32:RC_ICONS += images/cloud.ico
 
 DISTFILES += \
     fileview.qml

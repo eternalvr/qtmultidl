@@ -51,7 +51,7 @@ private slots:
     void on_btnDownloadSelected_clicked();
 
     void ShowTableContextMenu(const QPoint &point);
-    void on_tableWidget_doubleClicked(const QModelIndex &index);
+    void on_tableWidget_doubleClicked();
 
     void on_spinDownloads_valueChanged(int arg1);
     void onFileDeleted(MP3 mp3);

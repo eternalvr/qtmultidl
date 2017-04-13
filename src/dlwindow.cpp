@@ -383,7 +383,7 @@ void DLWindow::on_btnDownloadSelected_clicked()
 
 }
 
-void DLWindow::on_tableWidget_doubleClicked(const QModelIndex &index)
+void DLWindow::on_tableWidget_doubleClicked()
 {
    on_btnDownloadSelected_clicked();
 }

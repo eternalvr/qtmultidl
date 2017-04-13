@@ -20,5 +20,6 @@
         <file>images/user.png</file>
         <file>images/user_delete.png</file>
         <file>images/cloud.png</file>
+        <file>images/cloud.ico</file>
     </qresource>
 </RCC>
