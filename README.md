@@ -2,30 +2,6 @@
 
 Multidownload is a tool to simplify the download of multiple files from several music services.
 
-### Download
-
-##### Version 0.8 - first Beta
-Windows Installer: [MultiDownloadSetup](https://github.com/eternalvr/qtmultidl/releases/download/rel_0.8/MultiDownload0.8-Setup.exe) 36,1MB
-
-Mac OSX: [MultiDownload.dmg](https://github.com/eternalvr/qtmultidl/releases/download/rel_0.8/MultiDownload.dmg) 9.68MB
-
-Linux Sourcecode: 
-* [rel-0.8.tar.gz](https://github.com/eternalvr/qtmultidl/archive/rel_0.8.tar.gz)
-* [rel-0.8.zip](https://github.com/eternalvr/qtmultidl/archive/rel_0.8.zip)
-
-
-
-### First Setup
-
-* Start MultiDownload
-* Enter your music-service username in the username field
-* Enter your music-service password in the password field
-* Enter the domain of the music service e.g. www.zeeyee.de 
-* Hit SSL if you want the connection between you and the music service to be encrypted (if the service supports it)
-# MultiDownloader for music services
-
-Multidownload is a tool to simplify the download of multiple files from several music services.
-
 ## Download - Current Version: 0.9
 
 ### Version 0.9 - CURRENT
