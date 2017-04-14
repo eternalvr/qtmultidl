@@ -42,7 +42,7 @@ protected:
     void run();
     QNetworkAccessManager *manager;
     QNetworkRequest *request;
-    QNetworkReply *currentDownload;
+    QNetworkReply *currentDownload = NULL;
 
     QTime downloadTime;
 private:

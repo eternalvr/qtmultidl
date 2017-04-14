@@ -103,6 +103,8 @@ void DownloadThread::downloadFinished()
     if (currentDownload->error()) {
         outputFile->remove();
         emit onDownloadCancelled(this->Mp3);
+        progressBar->setValue(0);
+        progressBar->setFormat("Abgebrochen");
         RunMutex->unlock();
         return;
     }
@@ -119,8 +121,10 @@ void DownloadThread::downloadFinished()
 void DownloadThread::onCancelDownload(QString session)
 {
     qDebug() << "[" << QThread::currentThread() << "] DownloadThread::onCancelDownload";
-    if(this->Mp3.Session == session || session == "all"){
+    if(this->Mp3.Session == session || session == "-1"){
+    if(currentDownload != NULL) {
         if(currentDownload->isRunning())
             this->currentDownload->abort();
+        }
     }
 }

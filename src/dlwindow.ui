@@ -154,9 +154,9 @@ border: 1px solid black;
    <widget class="QPushButton" name="btnDownloadAll">
     <property name="geometry">
      <rect>
-      <x>490</x>
+      <x>450</x>
       <y>460</y>
-      <width>141</width>
+      <width>181</width>
       <height>23</height>
      </rect>
     </property>
@@ -244,9 +244,9 @@ border: 1px solid black;
    <widget class="QLabel" name="lblConcurrent">
     <property name="geometry">
      <rect>
-      <x>377</x>
+      <x>367</x>
       <y>494</y>
-      <width>201</width>
+      <width>211</width>
       <height>20</height>
      </rect>
     </property>
@@ -259,7 +259,7 @@ border: 1px solid black;
      <rect>
       <x>20</x>
       <y>480</y>
-      <width>251</width>
+      <width>281</width>
       <height>51</height>
      </rect>
     </property>
@@ -299,6 +299,23 @@ border: 1px solid black;
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnDownloadStopDownloads">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>460</y>
+      <width>181</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Downloads Abbrechen</string>
+    </property>
+    <property name="icon">
+     <iconset resource="icons.qrc">
+      <normaloff>:/default/images/transmit_delete.png</normaloff>:/default/images/transmit_delete.png</iconset>
     </property>
    </widget>
   </widget>

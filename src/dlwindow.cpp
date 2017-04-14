@@ -8,7 +8,7 @@ DLWindow::DLWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->pbPrefab->setVisible(false);
-
+    ui->btnDownloadStopDownloads->setVisible(false);
     createContextMenuActions();
 }
 
@@ -23,6 +23,8 @@ void DLWindow::createContextMenuActions()
     connect(this->ui->action_Beenden, &QAction::triggered, this, &DLWindow::close);
     connect(this->ui->actionAlles_Herunterladen, &QAction::triggered, this, &DLWindow::on_btnDownloadAll_clicked);
     connect(this->ui->actionAlles_L_schen, &QAction::triggered, this, &DLWindow::onDeleteAllClicked);
+
+
 }
 void DLWindow::onDeleteAllClicked()
 {
@@ -135,9 +137,13 @@ void DLWindow::ShowTableContextMenu(const QPoint &point)
             if(selectedItem == actionDownloadReset) {
                 QList<QTableWidgetItem *> selectedItems = ui->tableWidget->selectedItems();
                 foreach (QTableWidgetItem *item, selectedItems) {
-                    ((QProgressBar *)ui->tableWidget->cellWidget(item->row(), PROGRESSBAR_COLUMN))->setValue(0);
-                    cancelDownload(ui->tableWidget->item(item->row(), SESSION_COLUMN)->text());
+                    if(item->column() == 0) {
+                        emit cancelDownload(ui->tableWidget->item(item->row(), SESSION_COLUMN)->text());
+                        ((QProgressBar *)ui->tableWidget->cellWidget(item->row(), PROGRESSBAR_COLUMN))->setValue(0);
+                        ((QProgressBar *)ui->tableWidget->cellWidget(item->row(), PROGRESSBAR_COLUMN))->setFormat("");
+                    }
                 }
+                ShowHideCancelButton();
             }
             if(selectedItem == actionDownloadCancel) {
                 QList<QTableWidgetItem *> selectedItems = ui->tableWidget->selectedItems();
@@ -146,6 +152,7 @@ void DLWindow::ShowTableContextMenu(const QPoint &point)
                         emit cancelDownload(ui->tableWidget->item(item->row(), 4)->text());
                     }
                 }
+                ShowHideCancelButton();
             }
         }
 
@@ -175,6 +182,16 @@ void DLWindow::reloadMyMusic()
    connect(cInstance, &NetManager::onFailedRequest, this, &DLWindow::onFailedRequest);
 
    cInstance->Get(cInstance->GenerateUrl("mymusic?format=xml"));
+}
+void DLWindow::ShowHideCancelButton()
+{
+    if(downloadThreads->activeThreadCount() == 0) {
+        ui->btnDownloadStopDownloads->setVisible(false);
+        ui->btnDownloadAll->setVisible(true);
+    } else  {
+        ui->btnDownloadStopDownloads->setVisible(true);
+        ui->btnDownloadAll->setVisible(false);
+    }
 }
 
 void DLWindow::displayXml(QByteArray xml)
@@ -337,6 +354,7 @@ void DLWindow::startDownload(int row)
            downloadThreads->start(dlT);
         }
     }
+    ShowHideCancelButton();
 }
 
 void DLWindow::on_btnDownloadAll_clicked()
@@ -357,7 +375,7 @@ void DLWindow::on_btnDownloadAll_clicked()
      startDownload(i);
 
 
-
+    ShowHideCancelButton();
 }
 
 
@@ -380,7 +398,7 @@ void DLWindow::on_btnDownloadSelected_clicked()
             startDownload(item->row());
         }
     }
-
+    ShowHideCancelButton();
 
 }
 
@@ -414,15 +432,27 @@ void DLWindow::onSuccessfulDownload(MP3 mp3)
     if(ui->chkDeleteSuccessful->isChecked()) {
         deleteFromServer(mp3);
     }
+
+    ShowHideCancelButton();
 }
 
 void DLWindow::onFailedDownload(MP3 mp3)
 {
-    qDebug() << "Download NOT successful: " << mp3.ToString() << endl;
+   ShowHideCancelButton();
 }
 void DLWindow::deleteFromServer(MP3 mp3)
 {
     qDebug() << "Deleting from Server: " << mp3.ToString() << endl;
 
     deleteWorker->AddToQueue(mp3);
+}
+
+void DLWindow::on_btnDownloadStopDownloads_clicked()
+{
+    if(downloadThreads->activeThreadCount() > 0) {
+        downloadThreads->clear();
+        cancelDownload("-1");
+    }
+
+    ShowHideCancelButton();
 }

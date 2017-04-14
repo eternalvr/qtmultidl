@@ -62,6 +62,8 @@ private slots:
     void onMenuLogoutClick();
 
     void onDeleteAllClicked();
+    void on_btnDownloadStopDownloads_clicked();
+
 private:
     const int PROGRESSBAR_COLUMN = 3;
     const int SESSION_COLUMN = 4;
@@ -86,6 +88,7 @@ private:
     bool findMp3BySession(QString session, MP3* &mp3);
     void MarkRowDisabled(int row);
 
+    void ShowHideCancelButton();
 };
 
 #endif // DLWINDOW_H
