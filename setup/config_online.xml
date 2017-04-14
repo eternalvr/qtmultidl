@@ -9,4 +9,11 @@
     <TargetDir>@ApplicationsDir@/MultiDownload</TargetDir>
     <RunProgram>@TargetDir@/MultiDownload</RunProgram>
     <MaintenanceToolName>uninstall</MaintenanceToolName>
+    <RemoteRepositories>
+     <Repository>
+             <Url>http://repo.coderain.de/qtmultidl</Url>
+             <Enabled>1</Enabled>
+             <DisplayName>QT Multi Downloader Repository</DisplayName>
+     </Repository>
+</RemoteRepositories>
 </Installer>

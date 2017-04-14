@@ -1,5 +1,5 @@
 set BINPATH=C:\Qt\5.8\msvc2015\bin\windeployqt.exe
-set BINARY=..\..\build-MultiDownload-Desktop_Qt_5_8_0_MSVC2015_32bit-Release\release\MultiDownload.exe
+set BINARY=..\build-MultiDownload-Desktop_Qt_5_8_0_MSVC2015_32bit-Release\release\MultiDownload.exe
 SET VCINSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
 rmdir bintemp /Q /S
 mkdir bintemp
