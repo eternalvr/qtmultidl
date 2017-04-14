@@ -5,7 +5,7 @@ Multidownload is a tool to simplify the download of multiple files from several 
 ## Download - Current Version: 0.9
 
 ### Version 0.9 - CURRENT
-#####Windows 
+##### Windows 
 * Installer: [MultiDownload-0.9-Setup.exe](https://github.com/eternalvr/qtmultidl/releases/download/rel_0.9/MultiDownload-0.9-Setup.exe) 18MB
 
 * Offline Installer: [MultiDownload-0.9-OfflineSetup.exe](https://github.com/eternalvr/qtmultidl/releases/download/rel_0.9/MultiDownload-0.9-OfflineSetup.exe) 34,4MB
